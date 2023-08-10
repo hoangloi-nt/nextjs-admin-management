@@ -1,10 +1,11 @@
+export { default as IconStar } from "./IconStar";
 export { default as IconSearch } from "./IconSearch";
+export { default as IconProfile } from "./IconProfile";
+export { default as IconPerson } from "./IconPerson";
 export { default as IconNofitication } from "./IconNofitication";
+export { default as IconMessage } from "./IconMessage";
+export { default as IconLocation } from "./IconLocation";
 export { default as IconDashboard } from "./IconDashboard";
 export { default as IconBuilding } from "./IconBuilding";
-export { default as IconPerson } from "./IconPerson";
-export { default as IconStar } from "./IconStar";
-export { default as IconMessage } from "./IconMessage";
-export { default as IconProfile } from "./IconProfile";
-
-
+export { default as IconBed } from "./IconBed";
+export { default as IconCross } from "./IconCross";
