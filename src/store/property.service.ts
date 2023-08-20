@@ -8,7 +8,7 @@ export async function getProperties(): Promise<
   try {
     const res = await axios.get(`${API_URL}/property`);
     if (res.status === 200) {
-      return res.data;
+      return res.data.properties;
     }
     return [];
   } catch (error) {

@@ -6,7 +6,7 @@ import {
   IconProfile,
   IconStar,
 } from "@/components/icons";
-import { TSidebarLinks } from "@/types/general.types";
+import { TDropdownData, TSidebarLinks } from "@/types/general.types";
 
 export const sidebarLinks: TSidebarLinks[] = [
   {
@@ -38,5 +38,20 @@ export const sidebarLinks: TSidebarLinks[] = [
     title: "My profile",
     icon: <IconProfile />,
     path: "/my-profile",
+  },
+];
+
+export const statusData: TDropdownData[] = [
+  {
+    value: "",
+    label: "Any status",
+  },
+  {
+    value: "sale",
+    label: "For Sale",
+  },
+  {
+    value: "rent",
+    label: "For Rent",
   },
 ];
