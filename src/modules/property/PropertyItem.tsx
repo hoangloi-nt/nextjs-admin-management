@@ -1,46 +1,87 @@
 import { IconBed, IconCross, IconLocation } from "@/components/icons";
+import { Skeleton } from "@/components/loading";
+import { PropertyItemData } from "@/types/property.types";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface IPropertyItemProps {
-  children?: React.ReactNode;
+  item: PropertyItemData;
 }
-const PropertyItem = ({ children }: IPropertyItemProps) => {
+const PropertyItem = ({ item }: IPropertyItemProps) => {
+  if (!item) return null;
   return (
-    <div className="flex items-center gap-2">
+    <Link
+      href={{
+        pathname: `/property/${item.id}`,
+        query: {
+          id: item.id,
+        },
+      }}
+      className="flex items-center gap-2"
+    >
       <div className="relative">
         <Image
-          src="https://images.unsplash.com/photo-1661956602868-6ae368943878?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+          src={item.image && item.image.length > 0 ? item.image[0] : ""}
           alt="property item"
           width={201}
           height={125}
           className="object-cover rounded-xl"
+          priority
         ></Image>
       </div>
       <div className="flex-1">
         <span className="inline-block px-[10px] py-2 text-xs font-semibold text-primary rounded-[5px] bg-[#DADEFA] mb-3">
-          $7400
+          {item.price}
         </span>
         <h3 className="mb-[6px] text-base font-semibold text-primaryText">
-          Metro Jayakarta Hotel & Spa
+          {item.title}
         </h3>
         <div className="flex items-center gap-1 mb-3 text-gray80">
           <IconLocation></IconLocation>
-          <span>North Carolina, USA</span>
+          <span>{item.address}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
             <IconBed></IconBed>
-            <span className="text-xs font-medium">4 Beds</span>
+            <span className="text-xs font-medium">
+              {item.facility?.beds} Beds
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <IconCross></IconCross>
-            <span className="text-xs font-medium">28M</span>
+            <span className="text-xs font-medium">{item.facility?.area}</span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+export default PropertyItem;
+
+export const PropertyItemLoading = () => {
+  return (
+    <div className="flex items-center gap-2">
+      <Skeleton className="w-[201px] h-[125px] rounded-xl"></Skeleton>
+      <div className="flex-1">
+        <Skeleton className="w-full h-[30px] mb-2"></Skeleton>
+        <Skeleton className="w-full h-3 mb-3"></Skeleton>
+        <div className="flex items-center gap-1 mb-3 text-gray80">
+          <IconLocation></IconLocation>
+          <Skeleton className="w-20 h-3"></Skeleton>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <IconBed></IconBed>
+            <Skeleton className="w-20 h-3"></Skeleton>
+          </div>
+          <div className="flex items-center gap-1">
+            <IconCross></IconCross>
+            <Skeleton className="w-20 h-3"></Skeleton>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-export default PropertyItem;
