@@ -4,19 +4,26 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import PropertyItem, { PropertyItemLoading } from "./PropertyItem";
 import { Dropdown } from "@/components/dropdown";
-import { statusData } from "@/constants/general.const";
-
-type Filter = {
-  address: string;
-  status: string;
-  country: string;
-  type: string;
-  state: string;
-};
+import {
+  propertyStatusData,
+  propertyTypeData,
+} from "@/constants/general.const";
+import {
+  TFilter,
+  TPropertyStatusData,
+  TPropertyTypeData,
+} from "@/types/general.types";
+import { debounce } from "lodash";
 
 const PropertyList = () => {
-  const [filter, setFilter] = useState<Filter>({
-    address: "",
+  const [selected, setSelected] = useState({
+    statusText: "Any Status",
+    typeText: "Any Type",
+    countryText: "Any Countries",
+    stateText: "Any States",
+  });
+  const [filter, setFilter] = useState<TFilter>({
+    text: "",
     status: "",
     country: "",
     type: "",
@@ -24,14 +31,39 @@ const PropertyList = () => {
   });
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["properties"],
-    queryFn: () => getProperties(),
-    staleTime: 1 * 60 * 1000,
+    queryKey: ["properties", filter.text, filter.status, filter.type],
+    queryFn: () =>
+      getProperties({
+        text: filter.text,
+        status: filter.status,
+        type: filter.type,
+      }),
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   });
 
   const properties = data;
+  const handleFilterProperty = debounce(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFilter({ ...filter, text: e.target.value });
+    },
+    500
+  );
 
-  if (error || properties?.length === 0) return null;
+  const handleFilterByStatus = (value: TPropertyStatusData["value"]) => {
+    setFilter({ ...filter, status: value });
+    const foundStatus = propertyStatusData.find((item) => item.value === value);
+    setSelected({
+      ...selected,
+      statusText: value ? foundStatus?.label || "" : "Any Status",
+    });
+  };
+
+  const handleFilterByType = (value: TPropertyTypeData["value"]) => {
+    setFilter({ ...filter, type: value });
+  };
+
+  if (error) return null;
 
   return (
     <div className="p-5 bg-white rounded-2xl">
@@ -53,12 +85,21 @@ const PropertyList = () => {
             type="text"
             placeholder="Enter an address, city or Zip code"
             className="w-full text-xs font-medium bg-transparent outline-none"
+            onChange={handleFilterProperty}
           />
         </div>
-        <Dropdown data={statusData}></Dropdown>
-        <Dropdown selected="Any Type"></Dropdown>
-        <Dropdown selected="All Countries"></Dropdown>
-        <Dropdown selected="All States"></Dropdown>
+        <Dropdown
+          selected={selected.statusText}
+          data={propertyStatusData}
+          onClick={handleFilterByStatus}
+        ></Dropdown>
+        <Dropdown
+          selected={selected.typeText}
+          data={propertyTypeData}
+          onClick={handleFilterByType}
+        ></Dropdown>
+        <Dropdown selected={selected.countryText}></Dropdown>
+        <Dropdown selected={selected.stateText}></Dropdown>
         <button className="flex items-center gap-2.5 rounded-lg bg-grayf7 p-2 text-xs font-medium text-gray80">
           <span>
             <svg
