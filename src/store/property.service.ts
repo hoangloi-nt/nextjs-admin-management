@@ -3,17 +3,24 @@ import { TFilter } from "@/types/general.types";
 import { PropertyItemData } from "@/types/property.types";
 import axios from "axios";
 
-export async function getProperties(
-  params?: TFilter
-): Promise<PropertyItemData[] | null | undefined> {
+export async function getProperties(params?: TFilter): Promise<
+  | {
+      properties: PropertyItemData[] | null | undefined;
+      total: number;
+    }
+  | undefined
+> {
   try {
     const res = await axios.get(`${API_URL}/property`, {
       params,
     });
     if (res.status === 200) {
-      return res.data.properties;
+      return { properties: res.data.properties, total: res.data.total };
     }
-    return [];
+    return {
+      properties: [],
+      total: 0,
+    };
   } catch (error) {
     console.log(error);
   }

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import PropertyItem, { PropertyItemLoading } from "./PropertyItem";
 import { Dropdown } from "@/components/dropdown";
 import {
+  ITEMS_PER_PAGE,
   propertyStatusData,
   propertyTypeData,
 } from "@/constants/general.const";
@@ -14,8 +15,10 @@ import {
   TPropertyTypeData,
 } from "@/types/general.types";
 import { debounce } from "lodash";
+import { twMerge } from "tailwind-merge";
 
 const PropertyList = () => {
+  const [page, setPage] = useState<number>(1);
   const [selected, setSelected] = useState({
     statusText: "Any Status",
     typeText: "Any Type",
@@ -31,18 +34,23 @@ const PropertyList = () => {
   });
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["properties", filter.text, filter.status, filter.type],
+    queryKey: ["properties", filter.text, filter.status, filter.type, page],
     queryFn: () =>
       getProperties({
         text: filter.text,
         status: filter.status,
         type: filter.type,
+        offset: (page - 1) * ITEMS_PER_PAGE,
+        limit: ITEMS_PER_PAGE,
       }),
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
   });
 
-  const properties = data;
+  if (!data) return null;
+  const properties = data?.properties || [];
+  const total = data.total || 0;
+  const total_pages = Math.ceil(total / ITEMS_PER_PAGE);
   const handleFilterProperty = debounce(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setFilter({ ...filter, text: e.target.value });
@@ -142,14 +150,33 @@ const PropertyList = () => {
         aria-label="pagination"
         className="flex items-center justify-between"
       >
-        <p className="text-gray80">Showing 1 to 10 Properties</p>
+        <p className="text-gray80">
+          Showing {(page - 1) * ITEMS_PER_PAGE + 1} to {page * ITEMS_PER_PAGE}{" "}
+          Properties
+        </p>
         <div className="flex items-center gap-c10 ">
-          <button className="flex items-center justify-center text-white rounded-lg w-9 h-9 bg-primary">
+          {Array(total_pages)
+            .fill(0)
+            .map((item, index) => (
+              <button
+                key={index}
+                className={twMerge(
+                  "flex items-center justify-center rounded-lg w-9 h-9",
+                  page === index + 1
+                    ? "bg-primary text-white pointer-events-none"
+                    : "text-gray80"
+                )}
+                onClick={() => setPage(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+          {/* <button className="flex items-center justify-center text-white rounded-lg w-9 h-9 bg-primary">
             1
           </button>
           <button className="flex items-center justify-center rounded-lg w-9 h-9 text-gray80">
             2
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

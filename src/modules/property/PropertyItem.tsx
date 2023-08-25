@@ -20,16 +20,14 @@ const PropertyItem = ({ item }: IPropertyItemProps) => {
       }}
       className="flex items-center gap-2"
     >
-      <div className="relative">
-        <Image
-          src={item.image && item.image.length > 0 ? item.image[0] : ""}
-          alt="property item"
-          width={201}
-          height={125}
-          className="object-cover rounded-xl"
-          priority
-        ></Image>
-      </div>
+      <Image
+        src={item.image && item.image.length > 0 ? item.image[0] : ""}
+        alt="property item"
+        width={201}
+        height={125}
+        className="object-cover h-[125px] rounded-xl"
+        priority
+      ></Image>
       <div className="flex-1">
         <span className="inline-block px-[10px] py-2 text-xs font-semibold text-primary rounded-[5px] bg-[#DADEFA] mb-3">
           {item.price}

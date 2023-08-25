@@ -18,4 +18,6 @@ export type TFilter = {
   country?: string;
   type?: TPropertyTypeData["value"];
   state?: string;
+  offset?: number;
+  limit?: number;
 };
