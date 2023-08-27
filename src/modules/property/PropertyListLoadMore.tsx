@@ -1,6 +1,6 @@
 import { getProperties } from "@/store/property.service";
 import { PropertyItemData } from "@/types/property.types";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import PropertyItem, { PropertyItemLoading } from "./PropertyItem";
 import { Dropdown } from "@/components/dropdown";
@@ -17,9 +17,10 @@ import {
 import { debounce } from "lodash";
 import { twMerge } from "tailwind-merge";
 import { Button } from "@/components/button";
+import { Menu } from "@headlessui/react";
+import { DropdownItem } from "@/components/dropdown/Dropdown";
 
-const PropertyList = () => {
-  const [page, setPage] = useState<number>(1);
+const PropertyListLoadMore = () => {
   const [selected, setSelected] = useState({
     statusText: "Any Status",
     typeText: "Any Type",
@@ -34,24 +35,37 @@ const PropertyList = () => {
     state: "",
   });
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["properties", filter.text, filter.status, filter.type, page],
-    queryFn: () =>
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["properties", filter.text, filter.status, filter.type],
+    queryFn: ({ pageParam = 0 }) =>
       getProperties({
         text: filter.text,
         status: filter.status,
         type: filter.type,
-        offset: (page - 1) * ITEMS_PER_PAGE,
         limit: ITEMS_PER_PAGE,
+        offset: pageParam,
       }),
+    getNextPageParam: (lastPage) => {
+      const properties = lastPage?.properties || [];
+      if (properties?.length < ITEMS_PER_PAGE) {
+        return undefined;
+      }
+      return properties.length + ((lastPage && lastPage?.offset) || 0);
+    },
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
   });
 
   if (!data) return null;
-  const properties = data?.properties || [];
-  const total = data.total || 0;
-  const total_pages = Math.ceil(total / ITEMS_PER_PAGE);
+
   const handleFilterProperty = debounce(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setFilter({ ...filter, text: e.target.value });
@@ -70,6 +84,10 @@ const PropertyList = () => {
 
   const handleFilterByType = (value: TPropertyTypeData["value"]) => {
     setFilter({ ...filter, type: value });
+  };
+
+  const handleLoadMore = () => {
+    hasNextPage && fetchNextPage();
   };
 
   if (error) return null;
@@ -100,12 +118,26 @@ const PropertyList = () => {
         <Dropdown
           selected={selected.statusText}
           data={propertyStatusData}
-          onClick={handleFilterByStatus}
+          renderItems={(item) => (
+            <DropdownItem
+              key={item.value}
+              onClick={() => handleFilterByStatus(item.value)}
+            >
+              {item.label}
+            </DropdownItem>
+          )}
         ></Dropdown>
         <Dropdown
           selected={selected.typeText}
           data={propertyTypeData}
-          onClick={handleFilterByType}
+          renderItems={(item) => (
+            <DropdownItem
+              key={item.value}
+              onClick={() => handleFilterByType(item.value)}
+            >
+              {item.label}
+            </DropdownItem>
+          )}
         ></Dropdown>
         <Dropdown selected={selected.countryText}></Dropdown>
         <Dropdown selected={selected.stateText}></Dropdown>
@@ -142,40 +174,29 @@ const PropertyList = () => {
             .map((item, index) => (
               <PropertyItemLoading key={index}></PropertyItemLoading>
             ))}
-        {!isLoading &&
-          properties?.map((item: PropertyItemData) => (
-            <PropertyItem item={item} key={item.id}></PropertyItem>
-          ))}
+
+        {data.pages.map((page, index) => (
+          <React.Fragment key={index}>
+            {!isLoading &&
+              page?.properties &&
+              page?.properties?.map((item: PropertyItemData) => (
+                <PropertyItem item={item} key={item.id}></PropertyItem>
+              ))}
+          </React.Fragment>
+        ))}
       </div>
-      <div
-        aria-label="pagination"
-        className="flex items-center justify-between"
-      >
-        <p className="text-gray80">
-          Showing {(page - 1) * ITEMS_PER_PAGE + 1} to {page * ITEMS_PER_PAGE}{" "}
-          Properties
-        </p>
-        <div className="flex items-center gap-c10 ">
-          {Array(total_pages)
-            .fill(0)
-            .map((item, index) => (
-              <button
-                key={index}
-                className={twMerge(
-                  "flex items-center justify-center rounded-lg w-9 h-9",
-                  page === index + 1
-                    ? "bg-primary text-white pointer-events-none"
-                    : "text-gray80"
-                )}
-                onClick={() => setPage(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-        </div>
-      </div>
+      {hasNextPage && (
+        <Button
+          isLoading={isFetchingNextPage || isFetching}
+          className="w-24 mx-auto text-sm font-medium rounded-lg"
+          onClick={handleLoadMore}
+          disabled={!hasNextPage || isFetchingNextPage}
+        >
+          Load more
+        </Button>
+      )}
     </div>
   );
 };
 
-export default PropertyList;
+export default PropertyListLoadMore;

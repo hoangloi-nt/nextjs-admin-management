@@ -1,5 +1,6 @@
 import { LayoutMain } from "@/components/layout";
 import PropertyList from "@/modules/property/PropertyList";
+import PropertyListLoadMore from "@/modules/property/PropertyListLoadMore";
 import Link from "next/link";
 import React from "react";
 
@@ -17,7 +18,8 @@ const PropertyPage = () => {
           + Add Property
         </Link>
       </div>
-      <PropertyList></PropertyList>
+      {/* <PropertyList></PropertyList> */}
+      <PropertyListLoadMore></PropertyListLoadMore>
     </LayoutMain>
   );
 };
