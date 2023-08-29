@@ -1,4 +1,4 @@
-import { IconBed, IconCross, IconLocation } from "@/components/icons";
+import { IconBeds, IconCross, IconLocation } from "@/components/icons";
 import { Skeleton } from "@/components/loading";
 import { PropertyItemData } from "@/types/property.types";
 import Image from "next/image";
@@ -41,7 +41,7 @@ const PropertyItem = ({ item }: IPropertyItemProps) => {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
-            <IconBed></IconBed>
+            <IconBeds></IconBeds>
             <span className="text-xs font-medium">
               {item.facility?.beds} Beds
             </span>
@@ -71,7 +71,7 @@ export const PropertyItemLoading = () => {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
-            <IconBed></IconBed>
+            <IconBeds></IconBeds>
             <Skeleton className="w-20 h-3"></Skeleton>
           </div>
           <div className="flex items-center gap-1">

@@ -1,7 +1,7 @@
 export { default as IconArea } from "./IconArea";
 export { default as IconBalcony } from "./IconBalcony";
 export { default as IconBaths } from "./IconBaths";
-export { default as IconBed } from "./IconBed";
+export { default as IconBeds } from "./IconBeds";
 export { default as IconBuilding } from "./IconBuilding";
 export { default as IconCall } from "./IconCall";
 export { default as IconCross } from "./IconCross";

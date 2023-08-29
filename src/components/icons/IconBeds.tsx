@@ -1,6 +1,6 @@
 import React from "react";
 
-const IconBed = (props: JSX.IntrinsicElements["svg"]) => {
+const IconBeds = (props: JSX.IntrinsicElements["svg"]) => {
   return (
     <svg
       width={18}
@@ -18,4 +18,4 @@ const IconBed = (props: JSX.IntrinsicElements["svg"]) => {
   );
 };
 
-export default IconBed;
+export default IconBeds;

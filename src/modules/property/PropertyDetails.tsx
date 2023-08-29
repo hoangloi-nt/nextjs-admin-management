@@ -29,7 +29,7 @@ function renderFacilityIcon(item: [string, any]) {
   );
 }
 
-const PropertyDetails = () => {
+const PropertyDetails = (posts: any) => {
   const router = useRouter();
   const id = parseInt(router.query.id as string);
   const { data, isLoading, error } = useQuery({
@@ -37,6 +37,7 @@ const PropertyDetails = () => {
     queryFn: () => getProperty(id),
     staleTime: 1 * 60 * 1000,
     enabled: !!id,
+    initialData: posts?.posts || {},
   });
 
   if (!data || error) return null;

@@ -17,6 +17,7 @@ import {
 import { debounce } from "lodash";
 import { twMerge } from "tailwind-merge";
 import { Button } from "@/components/button";
+import { DropdownItem } from "@/components/dropdown/Dropdown";
 
 const PropertyList = () => {
   const [page, setPage] = useState<number>(1);
@@ -97,7 +98,7 @@ const PropertyList = () => {
             onChange={handleFilterProperty}
           />
         </div>
-        <Dropdown
+        {/* <Dropdown
           selected={selected.statusText}
           data={propertyStatusData}
           onClick={handleFilterByStatus}
@@ -106,6 +107,30 @@ const PropertyList = () => {
           selected={selected.typeText}
           data={propertyTypeData}
           onClick={handleFilterByType}
+        ></Dropdown> */}
+        <Dropdown
+          selected={selected.statusText}
+          data={propertyStatusData}
+          renderItems={(item) => (
+            <DropdownItem
+              key={item.value}
+              onClick={() => handleFilterByStatus(item.value)}
+            >
+              {item.label}
+            </DropdownItem>
+          )}
+        ></Dropdown>
+        <Dropdown
+          selected={selected.typeText}
+          data={propertyTypeData}
+          renderItems={(item) => (
+            <DropdownItem
+              key={item.value}
+              onClick={() => handleFilterByType(item.value)}
+            >
+              {item.label}
+            </DropdownItem>
+          )}
         ></Dropdown>
         <Dropdown selected={selected.countryText}></Dropdown>
         <Dropdown selected={selected.stateText}></Dropdown>
